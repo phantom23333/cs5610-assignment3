@@ -30,7 +30,7 @@ function AuthTokenProvider({ children }) {
     }
   }, [getAccessTokenSilently, isAuthenticated]);
 
-  const value = { accessToken };
+  const value = { accessToken, setAccessToken };
   return (
     <AuthTokenContext.Provider value={value}>
       {children}

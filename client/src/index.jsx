@@ -1,15 +1,38 @@
 import React from "react";
 import * as ReactDOMClient from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import AppLayout from "./components/AppLayout";
+import Posts from "./components/posts";
+import PostDetail from "./components/postDetail";
+import Profile from "./components/Profile";
 import NotFound from "./components/NotFound";
 import Home from "./components/Home";
-import { Auth0Provider } from "@auth0/auth0-react";
+import VerifyUser from "./components/VerifyUser";
+import AuthDebugger from "./components/AuthDebugger";
+
+import EditPost from './components/EditPost'; 
+import { Auth0Provider, useAuth0 } from "@auth0/auth0-react";
 import { AuthTokenProvider } from "./AuthTokenContext";
+import "./style/normalize.css";
+import "./style/index.css";
 
 const container = document.getElementById("root");
-const root = ReactDOMClient.createRoot(container);
 
 const requestedScopes = ["profile", "email"];
+
+function RequireAuth({ children }) {
+  const { isAuthenticated, isLoading } = useAuth0();
+
+  // If the user is not authenticated, redirect to the home page
+  if (!isLoading && !isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  // Otherwise, display the children (the protected page)
+  return children;
+}
+
+const root = ReactDOMClient.createRoot(container);
 
 root.render(
   <React.StrictMode>
@@ -26,6 +49,21 @@ root.render(
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/verify-user" element={<VerifyUser />} />
+            <Route
+              path="app"
+              element={
+                <RequireAuth>
+                  <AppLayout />
+                </RequireAuth>
+              }
+            >
+              <Route index element={<Profile />} />
+              <Route path="posts" element={<Posts />} />
+              <Route path="posts/:id" element={<PostDetail />} />
+              <Route path="debugger" element={<AuthDebugger />} />
+              <Route path="posts/:postId/edit" element={<EditPost />} />
+            </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

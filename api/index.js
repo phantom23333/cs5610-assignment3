@@ -132,12 +132,10 @@ app.post('/posts', requireAuth, async (req, res) => {
       data: {
         title,
         content,
-        category:{connect: {id:catId }},
-        user: { connect: { auth0Id } },
+        category: { connect: { id: category.id } },
+        user: { connect: { id: user.id } },
       },
-      include: {
-        category: true,
-      },
+      include: { category: true },
     });
 
     console.log(newItem);
